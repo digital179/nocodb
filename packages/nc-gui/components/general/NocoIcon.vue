@@ -25,8 +25,20 @@ const onClick = useThrottleFn(() => {
     @click="onClick"
   >
     <div class="relative">
-      <img class="hidden dark:block" :width="size" :height="size" alt="NocoDB" src="~/assets/img/icons/256x256-trans.png" />
-      <img class="dark:hidden" :width="size" :height="size" alt="NocoDB" src="~/assets/img/icons/256x256.png" />
+      <img
+        class="hidden dark:block border border-solid rounded"
+        :width="size"
+        :height="size"
+        alt="79 Digital"
+        src="~/assets/img/brand/logo-no-background.png"
+      />
+      <img
+        class="dark:hidden border border-solid rounded"
+        :width="size"
+        :height="size"
+        alt="79 Digital"
+        src="~/assets/img/brand/logo-no-background.png"
+      />
 
       <TransitionGroup name="layout" :duration="500">
         <template v-if="animate || ping">

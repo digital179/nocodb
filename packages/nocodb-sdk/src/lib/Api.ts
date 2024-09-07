@@ -3446,11 +3446,11 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title nocodb
+ * @title 79Digital
  * @version 1.0
  * @baseUrl http://localhost:8080
  *
- * NocoDB API Documentation
+ * 79Digital API Documentation
  */
 export class Api<
   SecurityDataType extends unknown

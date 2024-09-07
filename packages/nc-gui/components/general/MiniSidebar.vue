@@ -31,7 +31,7 @@ const logout = async () => {
           <template #title>
             {{ currentVersion }}
           </template>
-          <img width="35" alt="NocoDB" src="~/assets/img/icons/256x256-trans.png" />
+          <span>HNHUY179.PRO</span>
         </a-tooltip>
       </div>
 

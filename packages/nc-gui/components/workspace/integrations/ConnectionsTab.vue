@@ -251,7 +251,7 @@ onKeyStroke('ArrowDown', onDown)
 <template>
   <div class="h-full flex flex-col gap-6 nc-workspace-connections">
     <div class="flex flex-col justify-between gap-2 mx-1">
-      <div class="text-sm font-normal text-gray-600">
+      <div class="text-sm font-normal text-gray-600 hidden">
         <div>
           Manage connections for your integrations.
           <a target="_blank" href="https://docs.nocodb.com/integrations/actions-on-connection" rel="noopener noreferrer">

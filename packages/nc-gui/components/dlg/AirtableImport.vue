@@ -348,14 +348,14 @@ function downloadLogs(filename: string) {
           <!--          Credentials -->
           <span class="mr-3 pt-2 text-gray-500 text-xs">{{ $t('general.credentials') }}</span>
           <!--          Where to find this? -->
-          <a
+          <!-- <a
             href="https://docs.nocodb.com/bases/import-base-from-airtable#get-airtable-credentials"
             class="prose-sm underline text-grey text-xs"
             target="_blank"
             rel="noopener"
           >
             {{ $t('msg.info.airtable.credentials') }}
-          </a>
+          </a> -->
         </div>
 
         <a-form ref="form" :model="syncSource" name="quick-import-airtable-form" layout="horizontal" class="m-0">
@@ -443,27 +443,6 @@ function downloadLogs(filename: string) {
 
         <a-divider />
 
-        <!--        Questions / Help - Reach out here -->
-        <div>
-          <a href="https://github.com/nocodb/nocodb/issues/2052" target="_blank" rel="noopener noreferrer">
-            {{ $t('general.questions') }} / {{ $t('general.help') }} - {{ $t('general.reachOut') }}</a
-          >
-
-          <br />
-          <!--          This feature is currently in beta and more information can be found here -->
-          <div>
-            {{ $t('general.betaNote') }}
-            <a
-              class="prose-sm"
-              href="https://github.com/nocodb/nocodb/discussions/2122"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {{ $t('general.moreInfo') }}
-            </a>
-            .
-          </div>
-        </div>
       </div>
 
       <div v-if="step === 2">

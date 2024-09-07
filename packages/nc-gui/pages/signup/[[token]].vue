@@ -208,14 +208,14 @@ onMounted(async () => {
                 </a>
               </div>
 
-              <div v-if="!appInfo.disableEmailAuth" class="flex items-center gap-2">
+              <!-- <div v-if="!appInfo.disableEmailAuth" class="flex items-center gap-2">
                 <a-switch
                   v-model:checked="subscribe"
                   size="small"
                   class="my-1 hover:(ring ring-accent ring-opacity-100) focus:(!ring !ring-accent ring-opacity-100)"
                 />
                 <div class="prose-xs text-gray-500">{{ $t('msg.subscribeToOurWeeklyNewsletter') }}</div>
-              </div>
+              </div> -->
 
               <div class="text-end prose-sm">
                 {{ $t('msg.info.signUp.alreadyHaveAccount') }}
@@ -226,12 +226,12 @@ onMounted(async () => {
           </a-form>
         </div>
 
-        <div class="prose-sm mt-4 text-gray-500">
+        <!-- <div class="prose-sm mt-4 text-gray-500">
           {{ $t('msg.bySigningUp') }}
           <a class="prose-sm !text-gray-500 underline" target="_blank" href="https://nocodb.com/policy-nocodb" rel="noopener">
             {{ $t('title.termsOfService') }}</a
           >
-        </div>
+        </div> -->
       </div>
     </NuxtLayout>
   </div>

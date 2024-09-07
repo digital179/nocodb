@@ -48,8 +48,7 @@ hooks.hook('page:finish', () => {
               {{ currentVersion }}
             </template>
             <div class="flex items-center gap-2">
-              <img v-if="!isDashboard" width="120" alt="NocoDB" src="~/assets/img/brand/nocodb-full.png" />
-              <img v-else width="25" alt="NocoDB" src="~/assets/img/icons/256x256.png" />
+             <span>HNHUY179.PRO</span>
             </div>
           </a-tooltip>
         </div>
@@ -70,7 +69,7 @@ hooks.hook('page:finish', () => {
           <template #title>{{ $t('title.switchLanguage') }}</template>
 
           <div class="flex pr-4 items-center">
-            <LazyGeneralLanguage class="cursor-pointer text-2xl hover:text-accent" />
+            <!-- <LazyGeneralLanguage class="cursor-pointer text-2xl hover:text-accent" /> -->
           </div>
         </a-tooltip>
 
@@ -124,11 +123,11 @@ hooks.hook('page:finish', () => {
         </template>
       </a-layout-header>
 
-      <a-tooltip v-if="!appInfo.ee" placement="bottom">
+      <!-- <a-tooltip v-if="!appInfo.ee" placement="bottom">
         <template #title>{{ $t('title.switchLanguage') }}</template>
 
         <LazyGeneralLanguage v-if="!signedIn && !route.params.baseId && !route.params.erdUuid" class="nc-lang-btn" />
-      </a-tooltip>
+      </a-tooltip> -->
 
       <div class="w-full h-full overflow-hidden nc-layout-base-inner">
         <slot />

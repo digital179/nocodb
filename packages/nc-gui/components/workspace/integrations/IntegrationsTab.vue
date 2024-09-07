@@ -181,14 +181,14 @@ const handleAddIntegration = (category: IntegrationCategoryType, integration: In
               }"
             >
               <div class="flex-1">
-                <div class="text-sm font-normal text-gray-600 mb-2">
+                <!-- <div class="text-sm font-normal text-gray-600 mb-2">
                   <div>
                     Connect integrations with NocoDB.
                     <a href="https://docs.nocodb.com/category/integrations" target="_blank" rel="noopener noreferrer"
                       >Learn more</a
                     >
                   </div>
-                </div>
+                </div> -->
                 <a-input
                   v-model:value="searchQuery"
                   type="text"
@@ -201,9 +201,9 @@ const handleAddIntegration = (category: IntegrationCategoryType, integration: In
                   </template>
                 </a-input>
               </div>
-              <NcButton type="ghost" size="small" class="!text-primary" @click="requestIntegration.isOpen = true">
+              <!-- <NcButton type="ghost" size="small" class="!text-primary" @click="requestIntegration.isOpen = true">
                 Request Integration
-              </NcButton>
+              </NcButton> -->
             </div>
           </div>
 

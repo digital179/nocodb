@@ -201,7 +201,7 @@ const setColor = async (color: string, base: BaseType) => {
           }"
         />
         <template v-if="activePage === 'workspace'">
-          <div class="font-medium text-xl">Welcome to nocoDB</div>
+          <div class="font-medium text-xl">Welcome to HNHUY179.PRO</div>
           <div class="font-medium">Create your first Base!</div>
         </template>
         <template v-else-if="activePage === 'recent'">

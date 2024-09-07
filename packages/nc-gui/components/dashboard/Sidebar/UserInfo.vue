@@ -87,7 +87,7 @@ onMounted(() => {
               </div>
             </NcMenuItem>
             <NcDivider />
-            <a
+            <!-- <a
               v-e="['c:nocodb:discord']"
               href="https://discord.gg/5RgZmkW"
               target="_blank"
@@ -98,8 +98,8 @@ onMounted(() => {
                 <GeneralIcon class="social-icon" icon="ncDiscord" />
                 <span class="menu-btn"> {{ $t('labels.community.joinDiscord') }} </span>
               </NcMenuItem>
-            </a>
-            <a
+            </a> -->
+            <!-- <a
               v-e="['c:nocodb:reddit']"
               href="https://www.reddit.com/r/NocoDB"
               target="_blank"
@@ -110,8 +110,8 @@ onMounted(() => {
                 <GeneralIcon class="social-icon" icon="ncReddit" />
                 <span class="menu-btn"> {{ $t('labels.community.joinReddit') }} </span>
               </NcMenuItem>
-            </a>
-            <a
+            </a> -->
+            <!-- <a
               v-e="['c:nocodb:twitter']"
               href="https://twitter.com/nocodb"
               target="_blank"
@@ -122,8 +122,8 @@ onMounted(() => {
                 <GeneralIcon class="social-icon text-gray-500 group-hover:text-gray-800" icon="ncTwitter" />
                 <span class="menu-btn"> {{ $t('labels.twitter') }} </span>
               </NcMenuItem>
-            </a>
-            <template v-if="!appInfo.ee">
+            </a> -->
+            <!-- <template v-if="!appInfo.ee">
               <NcDivider />
               <a-popover key="language" class="lang-menu !py-1.5" placement="rightBottom">
                 <NcMenuItem>
@@ -145,12 +145,12 @@ onMounted(() => {
                   </div>
                 </template>
               </a-popover>
-            </template>
+            </template> -->
 
             <template v-if="!isMobileMode">
-              <NcDivider />
+              <!-- <NcDivider /> -->
 
-              <a
+              <!-- <a
                 v-e="['c:nocodb:forum-open']"
                 href="https://community.nocodb.com"
                 target="_blank"
@@ -174,9 +174,9 @@ onMounted(() => {
                   <GeneralIcon icon="file" class="menu-icon mt-0.5" />
                   <span class="menu-btn"> {{ $t('title.docs') }} </span>
                 </NcMenuItem>
-              </a>
+              </a> -->
 
-              <NcDivider />
+              <!-- <NcDivider /> -->
 
               <DashboardSidebarEEMenuOption v-if="isEeUI" />
 

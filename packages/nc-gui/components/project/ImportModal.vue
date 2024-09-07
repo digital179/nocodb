@@ -77,19 +77,19 @@ const onClick = (type: 'airtable' | 'csv' | 'excel' | 'json') => {
         <div class="text-base font-weight-700">{{ $t('general.import') }}</div>
       </div>
       <div class="row mb-10">
-        <div class="nc-base-view-import-sub-btn" @click="onClick('airtable')">
-          <GeneralIcon icon="airtable" />
-          <div class="label">{{ $t('labels.airtable') }}</div>
-        </div>
         <div class="nc-base-view-import-sub-btn" @click="onClick('csv')">
           <GeneralIcon icon="csv" />
           <div class="label">{{ $t('labels.csv') }}</div>
         </div>
-      </div>
-      <div class="row">
         <div class="nc-base-view-import-sub-btn" @click="onClick('excel')">
           <GeneralIcon icon="excelColored" />
           <div class="label">{{ $t('labels.excel') }}</div>
+        </div>
+      </div>
+      <div class="row">
+         <div class="nc-base-view-import-sub-btn" @click="onClick('airtable')">
+          <GeneralIcon icon="airtable" />
+          <div class="label">{{ $t('labels.airtable') }}</div>
         </div>
         <div class="nc-base-view-import-sub-btn" @click="onClick('json')">
           <GeneralIcon icon="code" />

@@ -599,10 +599,10 @@ function handleAutoScroll(scroll: boolean, className: string) {
           </div>
         </general-overlay>
       </div>
-      <div class="nc-edit-source-right-panel">
+      <!-- <div class="nc-edit-source-right-panel">
         <DashboardSettingsDataSourcesSupportedDocs />
         <NcDivider />
-      </div>
+      </div> -->
     </div>
     <div class="p-4 w-full flex items-center justify-between gap-3 border-t-1 border-gray-200">
       <div class="flex-1 flex items-center gap-3">

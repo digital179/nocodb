@@ -214,7 +214,7 @@ const supportedDocs = [
 
         <NcDivider class="!my-3" />
 
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1 hidden">
           <div
             class="p-2 text-xs text-gray-500 uppercase font-semibold"
             :style="{
@@ -224,7 +224,7 @@ const supportedDocs = [
             {{ $t('labels.documentation') }}
           </div>
 
-          <div v-for="(doc, idx) of supportedDocs" :key="idx" class="flex items-center gap-2 px-2 h-7">
+          <div v-for="(doc, idx) of supportedDocs" :key="idx" class="flex items-center gap-2 px-2 h-7 hidden">
             <GeneralIcon icon="bookOpen" class="flex-none w-4 h-4 text-gray-600" />
 
             <a

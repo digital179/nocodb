@@ -17,8 +17,8 @@ export default defineComponent({
                 },
                 [
                     h("img", {
-                        src: "https://cdn.nocodb.com/email/logo.png",
-                        alt: "NocoDB",
+                        src: "http://digital.hnhuy179.pro/email/logo.png",
+                        alt: "79 Digital",
                         style: {
                             height: "48px",
                         },

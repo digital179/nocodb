@@ -1,7 +1,8 @@
 <script lang="ts" setup></script>
 
 <template>
-  <div class="flex flex-row items-center w-full bg-white rounded-lg border-1 border-brand-500 shadow-sm mb-0.5 overflow-hidden">
+  <span></span>
+  <!-- <div class="flex flex-row items-center w-full bg-white rounded-lg border-1 border-brand-500 shadow-sm mb-0.5 overflow-hidden">
     <a
       v-e="['c:navbar:join-cloud']"
       class="flex flex-grow !no-underline items-center justify-center border-r-1 h-full hover:bg-gray-100"
@@ -76,7 +77,7 @@
         <GeneralIcon icon="help" class="!text-lg -mt-0.5 text-gray-700" />
       </NcButton>
     </a-tooltip>
-  </div>
+  </div> -->
 </template>
 
 <style lang="scss">

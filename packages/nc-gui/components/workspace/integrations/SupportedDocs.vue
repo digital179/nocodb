@@ -20,7 +20,7 @@ const supportedDocs = [
 
 <template>
   <div>
-    <div class="w-full flex flex-col gap-3">
+    <!-- <div class="w-full flex flex-col gap-3">
       <div class="text-sm text-gray-800 font-semibold">Supported Docs</div>
 
       <div>
@@ -38,6 +38,6 @@ const supportedDocs = [
           </a>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>

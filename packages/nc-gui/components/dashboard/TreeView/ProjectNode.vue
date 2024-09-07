@@ -638,7 +638,7 @@ async function openAudit(source: SourceType) {
                     </NcMenuItem>
 
                     <!-- Swagger: Rest APIs -->
-                    <NcMenuItem
+                    <!-- <NcMenuItem
                       v-if="isUIAllowed('apiDocs')"
                       key="api"
                       data-testid="nc-sidebar-base-rest-apis"
@@ -653,7 +653,7 @@ async function openAudit(source: SourceType) {
                         <GeneralIcon icon="snippet" class="group-hover:text-black !max-w-3.9" />
                         {{ $t('activity.account.swagger') }}
                       </div>
-                    </NcMenuItem>
+                    </NcMenuItem> -->
                   </template>
 
                   <template v-if="base?.sources?.[0]?.enabled && showBaseOption(base?.sources?.[0])">

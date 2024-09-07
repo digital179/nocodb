@@ -970,7 +970,7 @@ onMounted(async () => {
       </div>
 
       <div class="h-full bg-gray-50 border-l-1 w-80 p-5 rounded-br-2xl border-gray-200">
-        <div class="w-full flex flex-col gap-3">
+        <div class="w-full flex flex-col gap-3 hidden">
           <h2 class="text-sm text-gray-700 font-semibold !my-0">{{ $t('labels.supportDocs') }}</h2>
           <div>
             <div v-for="(doc, idx) of supportedDocs" :key="idx" class="flex items-center gap-1">

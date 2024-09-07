@@ -31,7 +31,7 @@ const { Container } = defaultComponents;
         >
           We’re excited to have you onboard.
         </p>
-        <a href="https://www.nocodb.com" style="text-decoration: none">
+        <a href="http://digital.hnhuy179.pro/" style="text-decoration: none">
           <div
               style="
               cursor: pointer;

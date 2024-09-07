@@ -755,10 +755,10 @@ const isIntgrationDisabled = (integration: IntegrationType = {}) => {
             </div>
           </general-overlay>
         </div>
-        <div class="nc-add-source-right-panel">
+        <!-- <div class="nc-add-source-right-panel">
           <DashboardSettingsDataSourcesSupportedDocs />
           <NcDivider />
-        </div>
+        </div> -->
       </div>
     </div>
   </NcModal>

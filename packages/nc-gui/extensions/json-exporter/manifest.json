@@ -6,9 +6,9 @@
   "entry": "json-exporter",
   "version": "0.1",
   "iconUrl": "json-exporter/assets/icon.png",
-  "publisherName": "NocoDB",
-  "publisherEmail": "contact@nocodb.com",
-  "publisherUrl": "https://www.nocodb.com",
+  "publisherName": "79Digital",
+  "publisherEmail": "contact@hnhuy179.pro",
+  "publisherUrl": "http://digital.hnhuy179.pro/",
   "disabled": true,
   "config": {
     "contentMinHeight": "190px"

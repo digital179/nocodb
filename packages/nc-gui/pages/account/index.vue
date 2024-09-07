@@ -173,7 +173,7 @@ const logout = async () => {
                 <template #title>{{ $t('title.switchLanguage') }}</template>
 
                 <div class="flex pr-4 items-center">
-                  <LazyGeneralLanguage class="cursor-pointer text-2xl hover:text-gray-800" />
+                  <!-- <LazyGeneralLanguage class="cursor-pointer text-2xl hover:text-gray-800" /> -->
                 </div>
               </a-tooltip>
 
