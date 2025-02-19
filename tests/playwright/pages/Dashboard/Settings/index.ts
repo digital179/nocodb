@@ -4,7 +4,6 @@ import { AuditSettingsPage } from './Audit';
 import { MiscSettingsPage } from './Miscellaneous';
 import { TeamsPage } from './Teams';
 import { DataSourcesPage } from './DataSources';
-import { SourcePage } from './Source';
 
 export enum SettingTab {
   TeamAuth = 'teamAndAuth',
@@ -21,7 +20,6 @@ export enum SettingsSubTab {
 
 export class SettingsPage extends BasePage {
   readonly audit: AuditSettingsPage;
-  readonly source: SourcePage;
   readonly miscellaneous: MiscSettingsPage;
   readonly dataSources: DataSourcesPage;
   readonly teams: TeamsPage;
@@ -32,20 +30,15 @@ export class SettingsPage extends BasePage {
     this.miscellaneous = new MiscSettingsPage(this);
     this.dataSources = new DataSourcesPage(this);
     this.teams = new TeamsPage(this);
-    this.source = new SourcePage(this);
   }
 
   get() {
-    return this.rootPage.locator('.nc-modal-settings');
+    return this.rootPage.locator('.nc-base-settings');
   }
 
   async selectTab({ tab, subTab }: { tab: SettingTab; subTab?: SettingsSubTab }) {
     await this.get().locator(`li[data-menu-id="${tab}"]`).click();
     if (subTab) await this.get().locator(`li[data-menu-id="${subTab}"]`).click();
-  }
-
-  async selectSubTab({ subTab }: { subTab: SettingsSubTab }) {
-    await this.get().locator(`li[data-menu-id="${subTab}"]`).click();
   }
 
   async close() {
@@ -54,8 +47,6 @@ export class SettingsPage extends BasePage {
   }
 
   async toggleNullEmptyFilters() {
-    await this.selectTab({ tab: SettingTab.ProjectSettings, subTab: SettingsSubTab.Miscellaneous });
     await this.miscellaneous.clickShowNullEmptyFilters();
-    await this.close();
   }
 }

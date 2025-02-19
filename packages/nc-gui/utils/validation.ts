@@ -1,4 +1,7 @@
+import type { ColumnType } from 'nocodb-sdk'
+import validator from 'validator'
 import { getI18n } from '../plugins/a.i18n'
+import { TypeConversionError } from '../error/type-conversion.error'
 
 export const validateEmail = (v: string) =>
   /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i.test(v)
@@ -15,6 +18,35 @@ export const validateTableName = {
 
       if (value.length > 52) {
         return reject(new Error(t('msg.error.columnNameExceedsCharacters', { value: 52 })))
+      }
+
+      // exclude . / \
+      // rest all characters allowed
+      // https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.5/acreldb/n0rfg6x1shw0ppn1cwhco6yn09f7.htm#:~:text=By%20default%2C%20MySQL%20encloses%20column,not%20truncate%20a%20longer%20name.
+      const m = value.match(/[./\\]/g)
+      if (m) {
+        // return `Following characters are not allowed ${m.map((c) => JSON.stringify(c)).join(', ')}`
+        return reject(
+          new Error(`${t('msg.error.followingCharactersAreNotAllowed')} ${m.map((c) => JSON.stringify(c)).join(', ')}`),
+        )
+      }
+      return resolve(true)
+    })
+  },
+}
+
+export const validateScriptName = {
+  validator: (_: unknown, value: string) => {
+    return new Promise((resolve, reject) => {
+      const { t } = getI18n().global
+
+      if (!value) {
+        // return 'Table name required'
+        return reject(new Error(t('msg.error.scriptNameRequired')))
+      }
+
+      if (value.length > 256) {
+        return reject(new Error(t('msg.error.columnNameExceedsCharacters', { value: 256 })))
       }
 
       // exclude . / \
@@ -75,22 +107,36 @@ export const layoutTitleValidator = {
   },
 }
 
-export const baseTitleValidator = {
-  validator: (rule: any, value: any) => {
-    const { t } = getI18n().global
+export const baseTitleValidator = (title: 'project' | 'connection' = 'project') => {
+  return {
+    validator: (rule: any, value: any) => {
+      const { t } = getI18n().global
 
-    return new Promise((resolve, reject) => {
-      if (value?.length > 50) {
-        reject(new Error(t('msg.error.projectNameExceeds50Characters')))
-      }
+      return new Promise((resolve, reject) => {
+        if (value?.length > 50) {
+          reject(
+            new Error(
+              t('msg.error.projectNameExceeds50Characters', {
+                title: title === 'project' ? t('objects.project') : t('general.connection'),
+              }),
+            ),
+          )
+        }
 
-      if (value[0] === ' ') {
-        reject(new Error(t('msg.error.projectNameCannotStartWithSpace')))
-      }
+        if (value[0] === ' ') {
+          reject(
+            new Error(
+              t('msg.error.projectNameCannotStartWithSpace', {
+                title: title === 'project' ? t('objects.project') : t('general.connection'),
+              }),
+            ),
+          )
+        }
 
-      resolve(true)
-    })
-  },
+        resolve(true)
+      })
+    },
+  }
 }
 
 export const fieldRequiredValidator = () => {
@@ -192,11 +238,7 @@ export const extraParameterValidator = {
     return new Promise((resolve, reject) => {
       const { t } = getI18n().global
       for (const param of value) {
-        if (param.key === '') {
-          // return reject(new Error('Parameter key cannot be empty'))
-          return reject(new Error(t('msg.error.parameterKeyCannotBeEmpty')))
-        }
-        if (value.filter((el: any) => el.key === param.key).length !== 1) {
+        if (!value.every((el) => el.key === '') && value.filter((el: any) => el.key === param.key).length !== 1) {
           // return reject(new Error('Duplicate parameter keys are not allowed'))
           return reject(new Error(t('msg.error.duplicateParameterKeysAreNotAllowed')))
         }
@@ -226,9 +268,30 @@ export const emailValidator = {
 export const urlValidator = {
   validator: (_: unknown, v: string) => {
     return new Promise((resolve, reject) => {
-      if (!v.length || isValidURL(v)) return resolve()
+      const { t } = getI18n().global
+
+      if (!v.length || isValidURL(v)) return resolve(true)
 
       reject(new Error(t('msg.error.invalidURL')))
     })
   },
+}
+
+export const validateColumnValue = (column: ColumnType, value: any) => {
+  if (value === undefined || value === null || value === '') return
+  const metaValidate = (column.meta as any)?.validate
+  const validate = (column as any).validate
+  if (validate && metaValidate) {
+    let validateObj: any
+    try {
+      validateObj = JSON.parse(validate)
+    } catch (ex) {}
+    if (validateObj.func?.[0] && validator[validateObj.func[0] as string]) {
+      const validatorFunc = validator[validateObj.func[0] as any]
+      const validationResult = validatorFunc(value)
+      if (!validationResult) {
+        throw new TypeConversionError(`Invalid value`)
+      }
+    }
+  }
 }

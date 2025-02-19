@@ -15,6 +15,7 @@ const props = withDefaults(
     allowClear?: boolean
     loading?: boolean
     suffixIcon?: keyof typeof iconMap
+    maxTagCount?: number
   }>(),
   {
     suffixIcon: 'arrowDown',
@@ -55,12 +56,17 @@ const onChange = (value: string) => {
     :mode="mode"
     :placeholder="placeholder"
     :show-search="showSearch"
+    :max-tag-count="maxTagCount"
     class="nc-select"
-    @change="onChange"
+    @change="onChange as any"
   >
     <template #suffixIcon>
       <GeneralLoader v-if="loading" />
       <GeneralIcon v-else class="text-gray-800 nc-select-expand-btn" :icon="suffixIcon" />
+    </template>
+
+    <template v-if="$slots.dropdownRender" #dropdownRender="{ menuNode }">
+      <slot name="dropdownRender" :menu-node="menuNode" />
     </template>
     <slot />
   </a-select>
@@ -88,7 +94,7 @@ const onChange = (value: string) => {
   }
 
   .ant-select-selection-item {
-    @apply font-medium pr-3 rounded-md;
+    @apply font-medium pr-3 rounded-md flex items-center;
   }
 
   .ant-select-selection-placeholder {
@@ -96,6 +102,14 @@ const onChange = (value: string) => {
   }
   .ant-select-selection-item-remove {
     @apply text-gray-800 !pb-1;
+  }
+
+  .ant-select-clear {
+    @apply flex;
+
+    svg {
+      @apply flex-none;
+    }
   }
 }
 .nc-select.ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {

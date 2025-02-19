@@ -3,11 +3,15 @@ const props = withDefaults(
   defineProps<{
     visible: boolean
     width?: string | number
-    size?: 'small' | 'medium' | 'large'
+    height?: string | number
+    size?: 'small' | 'medium' | 'large' | keyof typeof modalSizes
     destroyOnClose?: boolean
     maskClosable?: boolean
     showSeparator?: boolean
     wrapClassName?: string
+    closable?: boolean
+    ncModalClassName?: string
+    stopEventPropogation?: boolean
   }>(),
   {
     size: 'medium',
@@ -15,14 +19,21 @@ const props = withDefaults(
     maskClosable: true,
     showSeparator: true,
     wrapClassName: '',
+    closable: false,
+    ncModalClassName: '',
+    stopEventPropogation: false,
   },
 )
 
 const emits = defineEmits(['update:visible'])
 
-const { width: propWidth, destroyOnClose, maskClosable, wrapClassName: _wrapClassName, showSeparator } = props
+const { width: propWidth, height: propHeight, destroyOnClose, wrapClassName: _wrapClassName, showSeparator } = props
+
+const { maskClosable, ncModalClassName, stopEventPropogation } = toRefs(props)
 
 const { isMobileMode } = useGlobal()
+
+const ncModalRef = ref<HTMLDivElement | null>(null)
 
 const width = computed(() => {
   if (isMobileMode.value) {
@@ -45,12 +56,20 @@ const width = computed(() => {
     return '80rem'
   }
 
+  if (modalSizes[props.size]) {
+    return modalSizes[props.size].width
+  }
+
   return 'max(30vw, 600px)'
 })
 
 const height = computed(() => {
   if (isMobileMode.value) {
     return '95vh'
+  }
+
+  if (propHeight) {
+    return propHeight
   }
 
   if (props.size === 'small') {
@@ -63,6 +82,10 @@ const height = computed(() => {
 
   if (props.size === 'large') {
     return '80vh'
+  }
+
+  if (modalSizes[props.size]) {
+    return modalSizes[props.size].height
   }
 
   return 'auto'
@@ -79,6 +102,27 @@ const newWrapClassName = computed(() => {
 const visible = useVModel(props, 'visible', emits)
 
 const slots = useSlots()
+
+const stopPropagation = (event: MouseEvent) => {
+  event.stopPropagation()
+}
+
+if (stopEventPropogation.value) {
+  watch(ncModalRef, () => {
+    // stop event propogation in edit column
+    const modal = document.querySelector('.nc-modal-wrapper') as HTMLElement
+
+    if (visible.value && modal?.parentElement) {
+      // modal.parentElement.addEventListener('click', stopPropagation)
+      modal.parentElement.addEventListener('mousedown', stopPropagation)
+      // modal.parentElement.addEventListener('mouseup', stopPropagation)
+    } else if (modal?.parentElement) {
+      // modal.parentElement.removeEventListener('click', stopPropagation)
+      modal.parentElement.removeEventListener('mousedown', stopPropagation)
+      // modal.parentElement.removeEventListener('mouseup', stopPropagation)
+    }
+  })
+}
 </script>
 
 <template>
@@ -87,7 +131,7 @@ const slots = useSlots()
     :class="{ active: visible }"
     :width="width"
     :centered="true"
-    :closable="false"
+    :closable="closable"
     :wrap-class-name="newWrapClassName"
     :footer="null"
     :mask-closable="maskClosable"
@@ -95,9 +139,12 @@ const slots = useSlots()
     @keydown.esc="visible = false"
   >
     <div
+      ref="ncModalRef"
       class="flex flex-col nc-modal p-6 h-full"
+      :class="[`${ncModalClassName}`]"
       :style="{
         maxHeight: height,
+        ...(modalSizes[size] ? { height } : {}),
       }"
     >
       <div
@@ -105,7 +152,7 @@ const slots = useSlots()
         :class="{
           'border-b-1 border-gray-200': showSeparator,
         }"
-        class="flex pb-2 mb-2 text-lg font-medium"
+        class="flex pb-2 mb-2 nc-modal-header text-lg font-medium"
       >
         <slot name="header" />
       </div>
@@ -118,7 +165,7 @@ const slots = useSlots()
 <style lang="scss">
 .nc-modal-wrapper {
   .ant-modal-content {
-    @apply !p-0;
+    @apply !p-0 overflow-hidden;
   }
 }
 </style>
