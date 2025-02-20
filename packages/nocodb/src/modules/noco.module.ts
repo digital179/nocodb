@@ -22,7 +22,11 @@ import { UsersController } from '~/controllers/users/users.controller';
 import { UsersService } from '~/services/users/users.service';
 
 /* Metas */
-import { NC_ATTACHMENT_FIELD_SIZE } from '~/constants';
+import {
+  NC_ATTACHMENT_FIELD_SIZE,
+  NC_MAX_ATTACHMENTS_ALLOWED,
+  NC_NON_ATTACHMENT_FIELD_SIZE,
+} from '~/constants';
 import { MetaService } from '~/meta/meta.service';
 import { ApiDocsController } from '~/controllers/api-docs/api-docs.controller';
 import { ApiTokensController } from '~/controllers/api-tokens.controller';
@@ -122,6 +126,24 @@ import { PublicDatasExportService } from '~/services/public-datas-export.service
 import { PublicDatasService } from '~/services/public-datas.service';
 import { CalendarDatasController } from '~/controllers/calendars-datas.controller';
 import { CalendarDatasService } from '~/services/calendar-datas.service';
+import { IntegrationsController } from '~/controllers/integrations.controller';
+import { IntegrationsService } from '~/services/integrations.service';
+import { DataV3Service } from '~/services/v3/data-v3.service';
+import { Datav3Controller } from '~/controllers/data-v3.controller';
+import { BaseUsersV3Controller } from '~/controllers/v3/base-users-v3.controller';
+import { BaseUsersV3Service } from '~/services/v3/base-users-v3.service';
+import { BasesV3Controller } from '~/controllers/v3/bases-v3.controller';
+import { BasesV3Service } from '~/services/v3/bases-v3.service';
+import { TablesV3Service } from '~/services/v3/tables-v3.service';
+import { TablesV3Controller } from '~/controllers/v3/tables-v3.controller';
+import { ColumnsV3Controller } from '~/controllers/v3/columns-v3.controller';
+import { ColumnsV3Service } from '~/services/v3/columns-v3.service';
+import { SortsV3Service } from '~/services/v3/sorts-v3.service';
+import { SortsV3Controller } from '~/controllers/v3/sorts-v3.controller';
+import { ViewsV3Controller } from '~/controllers/v3/views-v3.controller';
+import { ViewsV3Service } from '~/services/v3/views-v3.service';
+import { FiltersV3Controller } from '~/controllers/v3/filters-v3.controller';
+import { FiltersV3Service } from '~/services/v3/filters-v3.service';
 
 export const nocoModuleMetadata = {
   imports: [
@@ -130,7 +152,9 @@ export const nocoModuleMetadata = {
     MulterModule.register({
       storage: multer.diskStorage({}),
       limits: {
-        fieldSize: NC_ATTACHMENT_FIELD_SIZE,
+        fieldSize: NC_NON_ATTACHMENT_FIELD_SIZE,
+        fileSize: NC_ATTACHMENT_FIELD_SIZE,
+        files: NC_MAX_ATTACHMENTS_ALLOWED,
       },
     }),
   ],
@@ -168,6 +192,7 @@ export const nocoModuleMetadata = {
           OrgUsersController,
           PluginsController,
           BaseUsersController,
+          BaseUsersV3Controller,
           BasesController,
           PublicMetasController,
           ViewsController,
@@ -181,6 +206,16 @@ export const nocoModuleMetadata = {
           CommandPaletteController,
           ExtensionsController,
           JobsMetaController,
+          IntegrationsController,
+
+          /* V3 APIs */
+          BasesV3Controller,
+          TablesV3Controller,
+          ColumnsV3Controller,
+          SortsV3Controller,
+          ViewsV3Controller,
+          FiltersV3Controller,
+
           /* Datas */
           DataTableController,
           DatasController,
@@ -192,6 +227,7 @@ export const nocoModuleMetadata = {
           OldDatasController,
           PublicDatasController,
           PublicDatasExportController,
+          Datav3Controller,
         ]
       : []),
   ],
@@ -236,6 +272,7 @@ export const nocoModuleMetadata = {
     OrgUsersService,
     PluginsService,
     BaseUsersService,
+    BaseUsersV3Service,
     BasesService,
     PublicMetasService,
     ViewsService,
@@ -249,6 +286,13 @@ export const nocoModuleMetadata = {
     CommandPaletteService,
     ExtensionsService,
     JobsMetaService,
+    IntegrationsService,
+    BasesV3Service,
+    TablesV3Service,
+    ColumnsV3Service,
+    SortsV3Service,
+    ViewsV3Service,
+    FiltersV3Service,
 
     /* Datas */
     DataTableService,
@@ -259,6 +303,7 @@ export const nocoModuleMetadata = {
     OldDatasService,
     PublicDatasService,
     PublicDatasExportService,
+    DataV3Service,
   ],
   exports: [
     /* Generic */
@@ -296,6 +341,8 @@ export const nocoModuleMetadata = {
     /* Datas */
     DatasService,
     BulkDataAliasService,
+    DataTableService,
+    DataV3Service,
   ],
 };
 

@@ -79,6 +79,26 @@ const onDecode = async (scannedCodeValue: string) => {
     console.error(error)
   }
 }
+
+const validateField = async (title: string) => {
+  if (fieldMappings.value[title] === undefined) {
+    console.warn('Missing mapping field for:', title)
+    return false
+  }
+
+  try {
+    await validate(fieldMappings.value[title])
+
+    return true
+  } catch (_e: any) {
+    return false
+  }
+}
+
+const { message: templatedMessage } = useTemplatedMessage(
+  computed(() => sharedFormView?.value?.success_msg),
+  computed(() => formState.value),
+)
 </script>
 
 <template>
@@ -117,8 +137,8 @@ const onDecode = async (scannedCodeValue: string) => {
               <a-alert class="nc-shared-form-success-msg !mt-2 !mb-4 !py-4 text-left !rounded-lg" type="success" outlined>
                 <template #message>
                   <LazyCellRichText
-                    v-if="sharedFormView?.success_msg?.trim()"
-                    :value="sharedFormView?.success_msg"
+                    v-if="templatedMessage"
+                    :value="templatedMessage"
                     class="!h-auto -ml-1"
                     is-form-field
                     read-only
@@ -129,7 +149,10 @@ const onDecode = async (scannedCodeValue: string) => {
               </a-alert>
 
               <div
-                v-if="sharedFormView.show_blank_form || sharedFormView.submit_another_form"
+                v-if="
+                  typeof sharedFormView?.redirect_url !== 'string' &&
+                  (sharedFormView.show_blank_form || sharedFormView.submit_another_form)
+                "
                 class="mt-16 w-full flex justify-between items-center flex-wrap gap-3"
               >
                 <p v-if="sharedFormView?.show_blank_form" class="text-sm text-gray-500 dark:text-slate-300 m-0">
@@ -232,7 +255,7 @@ const onDecode = async (scannedCodeValue: string) => {
                               :read-only="field?.read_only"
                               @update:model-value="
                                 () => {
-                                  validate(fieldMappings[field.title])
+                                  validateField(field.title)
                                 }
                               "
                             />
