@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker&inline'
-import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker&inline'
-
 import type { editor as MonacoEditor } from 'monaco-editor'
+import { languages, editor as monacoEditor } from 'monaco-editor'
+
+import PlaceholderContentWidget from './Placeholder'
 
 interface Props {
   modelValue: string | Record<string, any>
@@ -10,8 +10,11 @@ interface Props {
   lang?: string
   validate?: boolean
   disableDeepCompare?: boolean
+  placeholder?: string
   readOnly?: boolean
   autoFocus?: boolean
+  monacoConfig?: Partial<MonacoEditor.IStandaloneEditorConstructionOptions>
+  monacoCustomTheme?: Partial<MonacoEditor.IStandaloneThemeData>
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,13 +23,15 @@ const props = withDefaults(defineProps<Props>(), {
   validate: true,
   disableDeepCompare: false,
   autoFocus: true,
+  monacoConfig: () => ({} as Partial<MonacoEditor.IStandaloneEditorConstructionOptions>),
+  monacoCustomTheme: () => ({} as Partial<MonacoEditor.IStandaloneThemeData>),
 })
 
 const emits = defineEmits(['update:modelValue'])
 
-const { modelValue } = toRefs(props)
+const { modelValue, readOnly } = toRefs(props)
 
-const { hideMinimap, lang, validate, disableDeepCompare, readOnly, autoFocus } = props
+const { hideMinimap, lang, validate, disableDeepCompare, autoFocus, monacoConfig, monacoCustomTheme, placeholder } = props
 
 const vModel = computed<string>({
   get: () => {
@@ -55,8 +60,13 @@ const root = ref<HTMLDivElement>()
 
 let editor: MonacoEditor.IStandaloneCodeEditor
 
-const format = () => {
-  editor.setValue(JSON.stringify(JSON.parse(editor?.getValue() as string), null, 2))
+const format = (space = monacoConfig.tabSize || 2) => {
+  try {
+    const parsedValue = JSON.parse(editor?.getValue() as string)
+    editor.setValue(JSON.stringify(parsedValue, null, space))
+  } catch (error: unknown) {
+    console.error('Failed to parse and format JSON:', error)
+  }
 }
 
 defineExpose({
@@ -65,8 +75,6 @@ defineExpose({
 })
 
 onMounted(async () => {
-  const { editor: monacoEditor, languages } = await import('monaco-editor')
-
   if (root.value && lang) {
     const model = monacoEditor.createModel(vModel.value, lang)
 
@@ -77,10 +85,17 @@ onMounted(async () => {
       })
     }
 
+    let isCustomTheme = false
+
+    if (Object.keys(monacoCustomTheme).length) {
+      monacoEditor.defineTheme('custom', monacoCustomTheme)
+      isCustomTheme = true
+    }
+
     editor = monacoEditor.create(root.value, {
       model,
       contextmenu: false,
-      theme: 'vs',
+      theme: isCustomTheme ? 'custom' : 'vs',
       foldingStrategy: 'indentation',
       selectOnLineNumbers: true,
       language: props.lang,
@@ -89,9 +104,9 @@ onMounted(async () => {
         horizontalScrollbarSize: 1,
       },
       lineNumbers: 'off',
-      tabSize: 2,
+      tabSize: monacoConfig.tabSize || 2,
       automaticLayout: true,
-      readOnly,
+      readOnly: readOnly.value,
       bracketPairColorization: {
         enabled: true,
         independentColorPoolPerBracketType: true,
@@ -99,6 +114,8 @@ onMounted(async () => {
       minimap: {
         enabled: !hideMinimap,
       },
+      ...(lang === 'json' ? { detectIndentation: false, insertSpaces: true } : {}),
+      ...monacoConfig,
     })
 
     editor.onDidChangeModelContent(async () => {
@@ -118,9 +135,31 @@ onMounted(async () => {
       }
     })
 
-    if (!isDrawerOrModalExist() && autoFocus) {
+    if (placeholder) {
+      // eslint-disable-next-line no-new
+      new PlaceholderContentWidget(placeholder, editor)
+    }
+
+    const activeDrawerOrModal = isDrawerOrModalExist()
+
+    if (!activeDrawerOrModal && autoFocus) {
       // auto focus on json cells only
       editor.focus()
+    }
+
+    if (activeDrawerOrModal?.classList.contains('json-modal') && autoFocus) {
+      setTimeout(() => {
+        const lineCount = editor.getModel()?.getLineCount() ?? 0
+        const lastLineLength = editor.getModel()?.getLineContent(lineCount).length ?? 0
+        const endPosition = { lineNumber: lineCount, column: lastLineLength + 1 }
+        editor.setPosition(endPosition)
+        editor.revealPositionInCenter(endPosition)
+        editor.focus()
+      }, 200)
+    }
+
+    if (lang === 'json') {
+      format()
     }
   }
 })
@@ -138,18 +177,27 @@ watch(vModel, (v) => {
   }
 })
 
-watch(
-  () => readOnly,
-  (v) => {
-    if (!editor) return
+watch(readOnly, (v) => {
+  if (!editor) return
 
-    editor.updateOptions({ readOnly: v })
-  },
-)
+  editor.updateOptions({ readOnly: v })
+})
 </script>
 
 <template>
   <div ref="root"></div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+:deep(.monaco-editor) {
+  background-color: transparent !important;
+  border-radius: 8px !important;
+  .view-line * {
+    font-family: 'DM Mono', monospace !important;
+  }
+}
+
+:deep(.overflow-guard) {
+  border-radius: 8px !important;
+}
+</style>

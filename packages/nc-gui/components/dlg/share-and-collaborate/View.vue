@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ViewType } from 'nocodb-sdk'
+import { ViewLockType, type ViewType } from 'nocodb-sdk'
 import { LoadingOutlined } from '@ant-design/icons-vue'
 import ManageUsers from './ManageUsers.vue'
 import { useViewsStore } from '~/store/views'
@@ -7,6 +7,8 @@ import { useViewsStore } from '~/store/views'
 const { isViewToolbar } = defineProps<{
   isViewToolbar?: boolean
 }>()
+
+const isLocked = inject(IsLockedInj, ref(false))
 
 const { copy } = useCopy()
 const { dashboardUrl } = useDashboard()
@@ -147,9 +149,32 @@ watch(showShareModal, (val) => {
             class="max-w-79/100 ml-2 px-2 py-0.5 rounded-md bg-gray-100 capitalize text-ellipsis overflow-hidden"
             :style="{ wordBreak: 'keep-all', whiteSpace: 'nowrap' }"
           >
-            {{ activeView.title }}
+            <span v-if="activeView.is_default">{{ $t('labels.defaultView') }}</span>
+            <span v-else>
+              {{ activeView.title }}
+            </span>
           </div>
         </div>
+        <div v-if="isLocked" class="flex items-center gap-x-2 px-4 text-nc-content-gray-muted">
+          <component
+            :is="viewLockIcons[view.lock_type].icon"
+            v-if="view?.lock_type"
+            class="flex-none"
+            :class="{
+              'w-4 h-4': view?.lock_type === ViewLockType.Locked,
+              'w-3.5 h-3.5': view?.lock_type !== ViewLockType.Locked,
+            }"
+          />
+
+          <div class="flex-1">
+            {{
+              $t('title.viewSettingsCantBeChangedWhenViewIs', {
+                type: $t(viewLockIcons[activeView?.lock_type]?.title).toLowerCase(),
+              })
+            }}
+          </div>
+        </div>
+
         <DlgShareAndCollaborateSharePage />
       </div>
       <div class="share-base">

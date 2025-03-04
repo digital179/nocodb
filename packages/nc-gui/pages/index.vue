@@ -4,13 +4,7 @@ definePageMeta({
   hasSidebar: true,
 })
 
-const dialogOpen = ref(false)
-
-const openDialogKey = ref<string>('')
-
-const dataSourcesState = ref<string>('')
-
-const baseId = ref<string>()
+const { isSharedBase, isSharedErd } = storeToRefs(useBase())
 
 const basesStore = useBases()
 
@@ -39,7 +33,10 @@ const isSharedView = computed(() => {
   const routeName = (route.value.name as string) || ''
 
   // check route is not base page by route name
-  return !routeName.startsWith('index-typeOrId-baseId-') && !['index', 'index-typeOrId'].includes(routeName)
+  return (
+    !routeName.startsWith('index-typeOrId-baseId-') &&
+    !['index', 'index-typeOrId', 'index-typeOrId-feed', 'index-typeOrId-integrations'].includes(routeName)
+  )
 })
 
 const isSharedFormView = computed(() => {
@@ -53,6 +50,7 @@ const { sharedBaseId } = useCopySharedBase()
 const isDuplicateDlgOpen = ref(false)
 
 async function handleRouteTypeIdChange() {
+  console.log('shared view', isSharedFormView.value, isSharedView.value)
   // avoid loading bases for shared views
   if (isSharedView.value) {
     return
@@ -88,20 +86,6 @@ watch(
 // immediate watch, because if route is changed during page transition
 // It will error out nuxt
 onMounted(() => {
-  if (route.value.query?.continueAfterSignIn) {
-    localStorage.removeItem('continueAfterSignIn')
-    return navigateTo(route.value.query.continueAfterSignIn as string)
-  } else {
-    const continueAfterSignIn = localStorage.getItem('continueAfterSignIn')
-    localStorage.removeItem('continueAfterSignIn')
-    if (continueAfterSignIn) {
-      return navigateTo({
-        path: continueAfterSignIn,
-        query: route.value.query,
-      })
-    }
-  }
-
   handleRouteTypeIdChange().then(() => {
     if (sharedBaseId.value) {
       if (!isUIAllowed('baseDuplicate')) {
@@ -113,14 +97,15 @@ onMounted(() => {
   })
 })
 
-function toggleDialog(value?: boolean, key?: string, dsState?: string, pId?: string) {
-  dialogOpen.value = value ?? !dialogOpen.value
-  openDialogKey.value = key || ''
-  dataSourcesState.value = dsState || ''
-  baseId.value = pId || ''
-}
-
-provide(ToggleDialogInj, toggleDialog)
+watch(
+  [() => isSharedFormView.value, () => isSharedView.value, () => isSharedBase.value, () => isSharedErd.value],
+  (arr) => {
+    addConfirmPageLeavingRedirectToWindow(!arr.some(Boolean))
+  },
+  {
+    immediate: true,
+  },
+)
 </script>
 
 <template>
@@ -139,12 +124,6 @@ provide(ToggleDialogInj, toggleDialog)
         <NuxtPage />
       </template>
     </NuxtLayout>
-    <LazyDashboardSettingsModal
-      v-model:model-value="dialogOpen"
-      v-model:open-key="openDialogKey"
-      v-model:data-sources-state="dataSourcesState"
-      :base-id="baseId"
-    />
     <DlgSharedBaseDuplicate v-if="isUIAllowed('baseDuplicate')" v-model="isDuplicateDlgOpen" />
   </div>
 </template>

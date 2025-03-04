@@ -181,7 +181,7 @@ export class ExtractIdsMiddleware implements NestMiddleware, CanActivate {
       const hook = await Hook.get(context, params.hookId);
 
       if (!hook) {
-        NcError.genericNotFound('Webhook', params.hookId);
+        NcError.hookNotFound(params.hookId);
       }
 
       req.ncBaseId = hook.base_id;
@@ -354,6 +354,20 @@ export class ExtractIdsMiddleware implements NestMiddleware, CanActivate {
       req.ncBaseId = req.query.base_id;
     }
 
+    // if integration list endpoint is called with baseId, then extract baseId if it's valid
+    if (
+      req.route.path === '/api/v2/meta/integrations' &&
+      req.method === 'GET' &&
+      req.query.baseId
+    ) {
+      // check if baseId is valid and under the workspace
+      const base = await Base.get(context, req.query.baseId);
+      if (!base) {
+        NcError.baseNotFound(req.query.baseId);
+      }
+      req.ncBaseId = base.id;
+    }
+
     req.context = {
       workspace_id: null,
       base_id: req.ncBaseId,
@@ -402,6 +416,10 @@ export class AclMiddleware implements NestInterceptor {
     );
 
     const scope = this.reflector.get<string>('scope', context.getHandler());
+    const extendedScope = this.reflector.get<string>(
+      'extendedScope',
+      context.getHandler(),
+    );
 
     const req = context.switchToHttp().getRequest();
 
@@ -426,6 +444,10 @@ export class AclMiddleware implements NestInterceptor {
 
     const roles: Record<string, boolean> = extractRolesObj(userScopeRole);
 
+    // extendedScope is used to allow access based on extended scope in which permission is prefixed with scope name and separated by underscore
+    const extendedScopeRoles =
+      extendedScope && getUserRoleForScope(req.user, extendedScope);
+
     if (req?.user?.is_api_token && blockApiTokenAccess) {
       NcError.apiTokenNotAllowed();
     }
@@ -448,7 +470,7 @@ export class AclMiddleware implements NestInterceptor {
 
     const isAllowed =
       roles &&
-      Object.entries(roles).some(([name, hasRole]) => {
+      (Object.entries(roles).some(([name, hasRole]) => {
         return (
           hasRole &&
           rolePermissions[name] &&
@@ -458,13 +480,32 @@ export class AclMiddleware implements NestInterceptor {
             (rolePermissions[name].include &&
               rolePermissions[name].include[permissionName]))
         );
-      });
+      }) ||
+        // extendedScope is used to allow access based on extended scope in which permission is prefixed with scope name and separated by underscore
+        (extendedScopeRoles &&
+          Object.entries(extendedScopeRoles).some(([name, hasRole]) => {
+            return (
+              hasRole &&
+              rolePermissions[name] &&
+              (rolePermissions[name] === '*' ||
+                (rolePermissions[name].exclude &&
+                  !rolePermissions[name].exclude[
+                    scope + '_' + permissionName
+                  ]) ||
+                (rolePermissions[name].include &&
+                  rolePermissions[name].include[scope + '_' + permissionName]))
+            );
+          })));
     if (!isAllowed) {
-      NcError.forbidden(
-        `${permissionName} - ${getRolesLabels(
-          Object.keys(roles).filter((k) => roles[k]),
-        )} : Not allowed`,
-      );
+      NcError.permissionDenied(permissionName, roles, extendedScopeRoles);
+
+      // NcError.forbidden(
+      //
+      //
+      //   `${permissionName} - ${getRolesLabels(
+      //     Object.keys(roles).filter((k) => roles[k]),
+      //   )} : Not allowed`,
+      // );
     }
 
     // check if permission have source level permission restriction
@@ -525,15 +566,19 @@ export const Acl =
       scope = 'base',
       allowedRoles,
       blockApiTokenAccess,
+      extendedScope,
     }: {
       scope?: string;
       allowedRoles?: (OrgUserRoles | string)[];
       blockApiTokenAccess?: boolean;
+      extendedScope?: string;
     } = {},
   ) =>
   (target: any, key?: string, descriptor?: PropertyDescriptor) => {
     SetMetadata('permission', permissionName)(target, key, descriptor);
     SetMetadata('scope', scope)(target, key, descriptor);
+    // extendedScope is used to allow access based on extended scope in which permission is prefixed with scope name and separated by underscore
+    SetMetadata('extendedScope', extendedScope)(target, key, descriptor);
     SetMetadata('allowedRoles', allowedRoles)(target, key, descriptor);
     SetMetadata('blockApiTokenAccess', blockApiTokenAccess)(
       target,

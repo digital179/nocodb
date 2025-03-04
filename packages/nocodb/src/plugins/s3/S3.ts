@@ -1,19 +1,23 @@
 import { S3 as S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import type { S3ClientConfig } from '@aws-sdk/client-s3';
-import type { IStorageAdapterV2 } from 'nc-plugin';
+import type { IStorageAdapterV2 } from '~/types/nc-plugin';
 import GenericS3 from '~/plugins/GenericS3/GenericS3';
+import { S3_PATCH_KEYS } from '~/constants';
 
 interface S3Input {
   bucket: string;
   region: string;
-  access_key: string;
-  access_secret: string;
+  access_key?: string;
+  access_secret?: string;
   endpoint?: string;
   acl?: string;
+  force_path_style?: boolean;
 }
 
 export default class S3 extends GenericS3 implements IStorageAdapterV2 {
+  name = 'S3';
+
   protected input: S3Input;
 
   constructor(input: any) {
@@ -22,19 +26,37 @@ export default class S3 extends GenericS3 implements IStorageAdapterV2 {
 
   get defaultParams() {
     return {
-      ACL: this.input.acl || 'private',
+      ...(this.input.acl ? { ACL: this.input.acl } : {}),
       Bucket: this.input.bucket,
     };
+  }
+
+  protected patchKey(key: string): string {
+    if (!this.input.force_path_style) {
+      return key;
+    }
+
+    if (
+      S3_PATCH_KEYS.some((k) => key.startsWith(`${this.input.bucket}/nc/${k}`))
+    ) {
+      key = key.replace(`${this.input.bucket}/`, '');
+    }
+
+    return key;
   }
 
   public async init(): Promise<any> {
     const s3Options: S3ClientConfig = {
       region: this.input.region,
-      credentials: {
+      forcePathStyle: this.input.force_path_style ?? false,
+    };
+
+    if (this.input.access_key && this.input.access_secret) {
+      s3Options.credentials = {
         accessKeyId: this.input.access_key,
         secretAccessKey: this.input.access_secret,
-      },
-    };
+      };
+    }
 
     if (this.input.endpoint) {
       s3Options.endpoint = this.input.endpoint;
@@ -56,6 +78,11 @@ export default class S3 extends GenericS3 implements IStorageAdapterV2 {
         const endpoint = this.input.endpoint
           ? new URL(this.input.endpoint).host
           : `s3.${this.input.region}.amazonaws.com`;
+
+        if (this.input.force_path_style) {
+          return `https://${endpoint}/${this.input.bucket}/${uploadParams.Key}`;
+        }
+
         return `https://${this.input.bucket}.${endpoint}/${uploadParams.Key}`;
       } else {
         throw new Error('Upload failed or no data returned.');

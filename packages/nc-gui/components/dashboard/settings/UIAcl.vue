@@ -148,14 +148,19 @@ const columns = [
 <template>
   <div class="h-full flex flex-row w-full items-center justify-center">
     <div class="w-full h-full flex flex-col">
-      <NcTooltip class="mb-4 first-letter:capital font-bold max-w-100 truncate" show-on-truncate-only>
+      <NcTooltip class="mb-4 first-letter:capital" show-on-truncate-only>
         <template #title>{{ base.title }}</template>
-        <span> UI ACL : {{ base.title }} </span>
+        <span> Control view visibility for different roles to manage access efficiently. </span>
       </NcTooltip>
       <div class="flex flex-row items-center w-full mb-4 gap-2 justify-between">
-        <a-input v-model:value="searchInput" :placeholder="$t('placeholder.searchModels')" class="nc-acl-search !w-[400px]">
+        <a-input
+          v-model:value="searchInput"
+          :placeholder="$t('placeholder.searchModels')"
+          allow-clear
+          class="nc-acl-search nc-input-border-on-value !w-[400px] nc-input-sm"
+        >
           <template #prefix>
-            <component :is="iconMap.search" />
+            <component :is="iconMap.search" class="text-gray-600" />
           </template>
         </a-input>
         <div class="flex">
@@ -180,7 +185,7 @@ const columns = [
         :data="filteredTables"
         row-height="44px"
         header-row-height="44px"
-        class="h-[calc(100%_-_102px)] w-full"
+        class="h-[calc(100%_-_88px)] w-full"
       >
         <template #headerCell="{ column }">
           <template v-if="column.key === 'name'">
@@ -257,5 +262,3 @@ const columns = [
     </div>
   </div>
 </template>
-
-<style scoped lang="scss"></style>
